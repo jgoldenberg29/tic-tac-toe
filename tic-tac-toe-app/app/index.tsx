@@ -40,7 +40,7 @@ const GameBoard = () => {
   const styles = createStyles(theme, colorScheme);
 
   const move = (row: number, col: number) => {
-    if (currentBoard[row][col] !== "" || gameOver) return; 
+    if (currentBoard[row][col] !== "" || gameOver) return;
 
     const newBoard = currentBoard.map((r, i) =>
       r.map((cell, j) => (i === row && j === col ? turn : cell))
@@ -73,6 +73,15 @@ const GameBoard = () => {
     return null;
   }
 
+  const resetGame = async () => {
+    const emptyBoard = Array(3).fill("").map(() => Array(3).fill(""));
+    setCurrentBoard(emptyBoard);
+    setTurn("X");
+    setGameOver(false);
+    setWinner("");
+    await AsyncStorage.removeItem("CurrentGame");
+  };
+
   const flatBoard = currentBoard.flat().map((cell, index) => ({
     id: index.toString(),
     row: Math.floor(index / 3),
@@ -96,6 +105,11 @@ const GameBoard = () => {
         )}
       />
       <Text style={styles.turnText}>{gameOver ? `Winner: ${winner}` : `Turn: ${turn}`}</Text>
+
+      <Pressable style={styles.resetButton} onPress={resetGame}>
+        <Text style={styles.resetText}>Reset Game</Text>
+      </Pressable>
+
       <Link href="/history" style={{ marginHorizontal: 'auto' }} asChild>
         <Pressable>
           <Text>View Game History</Text>
@@ -133,6 +147,18 @@ function createStyles(theme: Theme, colorScheme: ColorSchemeName) {
     },
     oCell: {
       backgroundColor: 'lightcoral',
+    },
+    resetButton: {
+      marginTop: 10,
+      backgroundColor: '#ff5c5c',
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      borderRadius: 5,
+    },
+    resetText: {
+      color: 'white',
+      fontSize: 18,
+      fontWeight: 'bold',
     },
   });
 }
